@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多個字躲滑鼠</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      height: 200vh; /* 給 Google Sites 足夠高度 */
+      background: #ffffff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .stage {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .word {
+      font-size: 64px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .char {
+      display: inline-block;
+      transition: transform 0.2s ease-out;
+      will-change: transform;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stage">
+    <div class="word" id="word">滑 鼠 移 過 來</div>
+  </div>
+
+  <script>
+    const word = document.getElementById('word');
+    const strength = 0.35; // 每個字的躲避強度
+
+    // 把文字拆成一個一個字
+    const text = word.textContent;
+    word.textContent = '';
+    const chars = [];
+
+    for (const ch of text) {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.textContent = ch === ' ' ? '\u00A0' : ch;
+      word.appendChild(span);
+      chars.push(span);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      chars.forEach((char) => {
+        const rect = char.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+
+        char.style.transform = `translate(${-dx * strength}px, ${-dy * strength}px)`;
+      });
+    });
+
+    document.addEventListener('mouseleave', () => {
+      chars.forEach((char) => {
+        char.style.transform = 'translate(0, 0)';
+      });
+    });
+  </script>
+
+</body>
+</html>
